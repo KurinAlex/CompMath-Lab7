@@ -18,6 +18,11 @@
 
 			double a = bounds[0];
 			double b = bounds[1];
+			if (b < a)
+			{
+				throw new ArgumentException("Upper bound must be less than lower bound");
+			}
+
 			return Enumerable.Range(0, (int)((b - a) / h)).Sum(k => Formula(a + h * k, a + h * (k + 1)));
 		}
 	}

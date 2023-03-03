@@ -22,6 +22,10 @@
 			double x1 = bounds[1];
 			double y0 = bounds[2];
 			double y1 = bounds[3];
+			if (x1 < x0 || y1 < y0)
+			{
+				throw new ArgumentException("Upper bound must be less than lower bound");
+			}
 
 			double sum = 0.0;
 			int n = (int)((x1 - x0) / (2.0 * h));
@@ -42,6 +46,25 @@
 				}
 			}
 			return sum * h * h / 9.0;
+		}
+
+		public double ComputeH(double[] bounds, double trueValue, double maxErrorP)
+		{
+			const double maxH = 1.0;
+			const double stepH = 0.001;
+
+			double maxError = Math.Abs(trueValue / 100.0 * maxErrorP);
+			double h = maxH;
+			for (; h > 0.0; h -= stepH)
+			{
+				double res = Compute(bounds, h);
+				double error = Math.Abs(res - trueValue);
+				if (error <= maxError)
+				{
+					break;
+				}
+			}
+			return h;
 		}
 	}
 }

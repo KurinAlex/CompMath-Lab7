@@ -17,21 +17,24 @@
 		static double F2(double x, double y) => 6.0 * x * y * (1.0 + 4.0 * x * x * y * y);
 		static bool Area(double x, double y) => x <= 1.0 && -x * x <= y && y <= Math.Sqrt(x);
 
-		static readonly (INumericalIntegrationMethod, double[], double, double)[] quadratureMethods =
+		static readonly SimpsonCubatureMethod simpsonCubature = new(F2, Area);
+		static readonly double simpsonCubatureH = simpsonCubature.ComputeH(Bounds2, TrueValue2, 2.0);
+		static readonly (INumericalIntegrationMethod, double[], double, double)[] methodsData =
 		{
-			(new RiemannSumMethod(F1),            Bounds1, 0.1, TrueValue1),
-			(new TrapezoidalMethod(F1),           Bounds1, 0.1, TrueValue1),
-			(new SimpsonQuadratureMethod(F1),     Bounds1, 0.1, TrueValue1),
-			(new SimpsonCubatureMethod(F2, Area), Bounds2, 0.1, TrueValue2),
+			(new RiemannSumMethod(F1),        Bounds1, 0.1,              TrueValue1),
+			(new TrapezoidalMethod(F1),       Bounds1, 0.1,              TrueValue1),
+			(new SimpsonQuadratureMethod(F1), Bounds1, 0.1,              TrueValue1),
+			(simpsonCubature,                 Bounds2, simpsonCubatureH, TrueValue2),
 		};
 
 		static void Main()
 		{
-			foreach (var (method, bounds, h, trueValue) in quadratureMethods)
+			foreach (var (method, bounds, h, trueValue) in methodsData)
 			{
 				double res = method.Compute(bounds, h);
-				double error = Math.Abs(trueValue - res) / trueValue;
+				double error = Math.Abs((trueValue - res) / trueValue);
 				Console.WriteLine($"{method.Name}:");
+				Console.WriteLine($"h:          {h}");
 				Console.WriteLine($"True value: {trueValue}");
 				Console.WriteLine($"Result:     {res}");
 				Console.WriteLine($"Error:      {error:P6}");
